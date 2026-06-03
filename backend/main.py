@@ -81,7 +81,7 @@ def strava_login():
 
 @app.get("/auth/strava/callback")
 async def strava_callback(code: str, db: Session = Depends(get_db)):
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=15.0) as client:
         r = await client.post("https://www.strava.com/oauth/token", data={
             "client_id": STRAVA_CLIENT_ID,
             "client_secret": STRAVA_CLIENT_SECRET,
@@ -131,7 +131,7 @@ async def sync_activities(
     headers = {"Authorization": f"Bearer {athlete.access_token}"}
     page, per_page, total_new = 1, 100, 0
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=60.0) as client:
         while True:
             r = await client.get(
                 "https://www.strava.com/api/v3/athlete/activities",
